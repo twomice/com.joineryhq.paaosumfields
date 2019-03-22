@@ -3,6 +3,120 @@
 require_once 'paaosumfields.civix.php';
 use CRM_Paaosumfields_ExtensionUtil as E;
 
+function _paaosumfields_get_setting($setting) {
+  static $settings = array(
+    'membership_ftid' => 2,
+    'membership_in_training_mtid' => 2,
+  );
+
+  if (!array_key_exists('fiscal_month_day', $settings)) {
+    // Compile MM-DD part of fiscal year start date, as basis for "5 recent annual
+    // membership payments" based on fiscal year:
+    $config = CRM_Core_Config::singleton();
+    $settings['fiscal_month_day'] = "{$config->fiscalYearStart['M']}/{$config->fiscalYearStart['d']}";
+  }
+
+  return CRM_Utils_Array::value($setting, $settings);
+}
+
+/**
+ * Implements hook_civicrm_sumfields_definitions().
+ *
+ */
+function paaosumfields_civicrm_sumfields_definitions(&$custom) {
+
+  // Define a new optgroup fieldset, to contain our PAAO custom fields
+  // and options.
+  $custom['optgroups']['paao_membership'] = array(
+    'title' => 'PAAO Membership Fields',
+    'fieldset' => 'PAAO',
+    'component' => 'CiviMember',
+  );
+
+  $custom['fields']['membership_payments_100'] = array(
+    'label' => E::ts('Count of Membership Payments $100 or more'),
+    'data_type' => 'Int',
+    'html_type' => 'Text',
+    'text_length' => '32',
+    'trigger_sql' => '(
+      SELECT
+        count(*)
+      FROM civicrm_contribution
+      WHERE
+        contact_id = NEW.contact_id
+        AND contribution_status_id = 1
+        AND financial_type_id = '. _paaosumfields_get_setting('membership_ftid') . '
+        AND total_amount >= 100
+    )',
+    'trigger_table' => 'civicrm_contribution',
+    'optgroup' => 'paao_membership',
+  );
+
+  $custom['fields']['has_five_membership_payments'] = array(
+    'label' => E::ts('Has five recent consecutive membership payments $100 or more'),
+    'data_type' => 'Boolean',
+    'html_type' => 'Radio',
+    'is_searchable' => 1,
+    'is_searchable_range' => 0,
+    'trigger_sql' => "(
+      SELECT
+        count(*) >= 5
+      FROM civicrm_contribution
+      WHERE
+        contact_id = NEW.contact_id
+        AND contribution_status_id = 1
+        AND financial_type_id = ". _paaosumfields_get_setting('membership_ftid') . "
+        AND total_amount >= 100
+        -- receive_date >= five years before the start of the current fiscal year;
+        -- according to the current civicrm config, fiscal year starts on
+        -- (Month/Day) ". _paaosumfields_get_setting('fiscal_month_day') .".
+        AND receive_date >= STR_TO_DATE(CONCAT((YEAR(CURDATE()) - 5),'/','". _paaosumfields_get_setting('fiscal_month_day') ."'), '%Y/%m/%d')
+    )",
+    'trigger_table' => 'civicrm_contribution',
+    'optgroup' => 'paao_membership',
+  );
+
+  $custom['fields']['membership_member_in_training'] = array(
+    'label' => E::ts('Count of of "Member-In-Training" memberships'),
+    'data_type' => 'Int',
+    'html_type' => 'Text',
+    'text_length' => '32',
+    'trigger_sql' => '(
+      SELECT
+        count(*)
+      FROM civicrm_membership
+      WHERE
+        contact_id = NEW.contact_id
+        AND membership_type_id = '. _paaosumfields_get_setting('membership_in_training_mtid') . '
+    )',
+    'trigger_table' => 'civicrm_membership',
+    'optgroup' => 'paao_membership',
+  );
+}
+
+
+/**
+ * Implements hook_civicrm_postProcess().
+ */
+function paaosumfields_civicrm_postProcess($formName, &$form) {
+  if ($formName == 'CRM_Sumfields_Form_SumFields') {
+    // Problem: SummaryFields is not saving some properties correctly
+    // for Yes/No summary fields
+    // Solution: here we get the ID of our Yes/No summary field and then use
+    // the api to change field properties.
+    $customFieldParameters = sumfields_get_setting('custom_field_parameters');
+    $field = CRM_Utils_Array::value('has_five_membership_payments', $customFieldParameters);
+    $result = civicrm_api3('CustomField', 'create', array(
+      'id' => CRM_Utils_Array::value('id', $field),
+      'is_search_range' => 0,
+      'is_searchable' => 1,
+      'is_view' => 1,
+    ));
+
+    dsm($result, 'result');
+  }
+}
+
 /**
  * Implements hook_civicrm_config().
  *
