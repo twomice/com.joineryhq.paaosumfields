@@ -1,15 +1,19 @@
 # com.joineryhq.paaosumfields
 
-![Screenshot](/images/screenshot.png)
+![Screenshot](/images/paaosumfields.png)
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+Extends the Summary Fields extension by adding three fields relevant to PAAO:
+
+* Count of Membership Payments $100 or more
+* Has five recent consecutive membership payments $100 or more
+* Count of of "Member-In-Training" memberships
 
 The extension is licensed under [GPL-3.0](LICENSE.txt).
 
 ## Requirements
 
 * PHP v5.4+
-* CiviCRM (*FIXME: Version number*)
+* CiviCRM >= 4.7
 
 ## Installation (Web UI)
 
@@ -22,7 +26,7 @@ install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
 cd <extension-dir>
-cv dl com.joineryhq.paaosumfields@https://github.com/FIXME/com.joineryhq.paaosumfields/archive/master.zip
+cv dl com.joineryhq.paaosumfields@https://github.com/twomice/com.joineryhq.paaosumfields/archive/master.zip
 ```
 
 ## Installation (CLI, Git)
@@ -31,14 +35,15 @@ Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) 
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
-git clone https://github.com/FIXME/com.joineryhq.paaosumfields.git
+git clone https://github.com/twomice/com.joineryhq.paaosumfields.git
 cv en paaosumfields
 ```
 
 ## Usage
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
+New fields are added at the bottom of the Summary Fields configuration form, which
+is, by default, accessible at Administer > Custom Data and Screens > Summary Fields.
 
-## Known Issues
+## Issues and support
 
-(* FIXME *)
+Please report any issues at https://github.com/twomice/com.joineryhq.paaosumfields/issues
