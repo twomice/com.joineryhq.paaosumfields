@@ -3,6 +3,10 @@
 require_once 'paaosumfields.civix.php';
 use CRM_Paaosumfields_ExtensionUtil as E;
 
+/**
+ * Helper function to manage settings; aims to ease maintenance where hardcoded
+ * values are used.
+ */
 function _paaosumfields_get_setting($setting) {
   static $settings = array(
     'membership_ftid' => 2,
