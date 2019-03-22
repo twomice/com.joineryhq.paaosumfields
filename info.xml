@@ -9,7 +9,9 @@
     <email>allen@JoineryHQ.com</email>
   </maintainer>
   <urls>
-    <url desc="Support">http://joineryhq.com</url>
+    <url desc="Main Extension Page">https://github.com/twomice/com.joineryhq.paaosumfields</url>
+    <url desc="Documentation">https://github.com/twomice/com.joineryhq.paaosumfields</url>
+    <url desc="Support">https://github.com/twomice/com.joineryhq.paaosumfields/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/gpl-3.0.html</url>
   </urls>
   <releaseDate>2019-03-21</releaseDate>
