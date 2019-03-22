@@ -1,6 +1,6 @@
 # PAAO Summary Fields
 
-![Screenshot](/images/paaosumfields.png)
+![Screenshot](/images/screenshot.png)
 
 Extends the Summary Fields extension by adding three fields relevant to PAAO:
 
