@@ -1,4 +1,4 @@
-# com.joineryhq.paaosumfields
+# PAAO Summary Fields
 
 ![Screenshot](/images/paaosumfields.png)
 
