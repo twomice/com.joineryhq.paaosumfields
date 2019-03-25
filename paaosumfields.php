@@ -109,15 +109,14 @@ function paaosumfields_civicrm_postProcess($formName, &$form) {
     // Solution: here we get the ID of our Yes/No summary field and then use
     // the api to change field properties.
     $customFieldParameters = sumfields_get_setting('custom_field_parameters');
-    $field = CRM_Utils_Array::value('has_five_membership_payments', $customFieldParameters);
-    $result = civicrm_api3('CustomField', 'create', array(
-      'id' => CRM_Utils_Array::value('id', $field),
-      'is_search_range' => 0,
-      'is_searchable' => 1,
-      'is_view' => 1,
-    ));
-
-    dsm($result, 'result');
+    if ($field = CRM_Utils_Array::value('has_five_membership_payments', $customFieldParameters) ){
+      $result = civicrm_api3('CustomField', 'create', array(
+        'id' => CRM_Utils_Array::value('id', $field),
+        'is_search_range' => 0,
+        'is_searchable' => 1,
+        'is_view' => 1,
+      ));
+    }
   }
 }
 
