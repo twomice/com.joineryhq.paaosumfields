@@ -10,7 +10,7 @@ use CRM_Paaosumfields_ExtensionUtil as E;
 function _paaosumfields_get_setting($setting) {
   static $settings = array(
     'membership_ftid' => 2,
-    'membership_in_training_mtid' => 2,
+    'membership_in_training_mtid' => 4,
   );
 
   if (!array_key_exists('fiscal_month_day', $settings)) {
