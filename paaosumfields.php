@@ -13,13 +13,6 @@ function _paaosumfields_get_setting($setting) {
     'membership_in_training_mtid' => 4,
   );
 
-  if (!array_key_exists('fiscal_month_day', $settings)) {
-    // Compile MM-DD part of fiscal year start date, as basis for "5 recent annual
-    // membership payments" based on fiscal year:
-    $config = CRM_Core_Config::singleton();
-    $settings['fiscal_month_day'] = "{$config->fiscalYearStart['M']}/{$config->fiscalYearStart['d']}";
-  }
-
   return CRM_Utils_Array::value($setting, $settings);
 }
 
@@ -64,17 +57,37 @@ function paaosumfields_civicrm_sumfields_definitions(&$custom) {
     'is_searchable_range' => 0,
     'trigger_sql' => "(
       SELECT
-        count(*) >= 5
-      FROM civicrm_contribution
+        -- compare a sorted, comma-separated list of distinct years against
+        -- two possible valid sets: all years including the current year and 4
+        -- most recent previous years; and all years excluding current year and
+        -- including the 5 most recent previous years.  If the list of unique
+        -- years matches either of those, we know we have contributions in
+        -- 5 most recent consecutive years for a period optionally including the
+        -- current year.
+        GROUP_CONCAT(DISTINCT(YEAR(receive_date)) ORDER BY receive_date ASC SEPARATOR ',') IN (
+        CONCAT(
+          YEAR(CURDATE()) - 4, ',',
+          YEAR(CURDATE()) - 3, ',',
+          YEAR(CURDATE()) - 2, ',',
+          YEAR(CURDATE()) - 1, ',',
+          YEAR(CURDATE())
+        ),
+        concat (
+          YEAR(CURDATE()) - 5, ',',
+          YEAR(CURDATE()) - 4, ',',
+          YEAR(CURDATE()) - 3, ',',
+          YEAR(CURDATE()) - 2, ',',
+          YEAR(CURDATE()) - 1
+        ))
+      FROM
+        civicrm_contribution
       WHERE
         contact_id = NEW.contact_id
         AND contribution_status_id = 1
         AND financial_type_id = ". _paaosumfields_get_setting('membership_ftid') . "
         AND total_amount >= 100
-        -- receive_date >= five years before the start of the current fiscal year;
-        -- according to the current civicrm config, fiscal year starts on
-        -- (Month/Day) ". _paaosumfields_get_setting('fiscal_month_day') .".
-        AND receive_date >= STR_TO_DATE(CONCAT((YEAR(CURDATE()) - 5),'/','". _paaosumfields_get_setting('fiscal_month_day') ."'), '%Y/%m/%d')
+        AND YEAR(receive_date) >= YEAR(CURDATE()) - 5
+      GROUP BY contact_id
     )",
     'trigger_table' => 'civicrm_contribution',
     'optgroup' => 'paao_membership',
