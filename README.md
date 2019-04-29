@@ -5,7 +5,7 @@
 Extends the Summary Fields extension by adding three fields relevant to PAAO:
 
 * Count of Membership Payments $100 or more
-* Has five recent consecutive membership payments $100 or more
+* Loyalty discount 
 * Count of of "Member-In-Training" memberships
 
 The extension is licensed under [GPL-3.0](LICENSE.txt).
