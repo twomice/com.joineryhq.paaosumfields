@@ -49,45 +49,28 @@ function paaosumfields_civicrm_sumfields_definitions(&$custom) {
     'optgroup' => 'paao_membership',
   );
 
-  $custom['fields']['has_five_membership_payments'] = array(
-    'label' => E::ts('Has five recent consecutive membership payments $100 or more'),
+  $custom['fields']['loyalty_discount'] = array(
+    'label' => E::ts('Loyalty discount'),
     'data_type' => 'Boolean',
     'html_type' => 'Radio',
     'is_searchable' => 1,
     'is_searchable_range' => 0,
     'trigger_sql' => "(
       SELECT
-        -- compare a sorted, comma-separated list of distinct years against
-        -- two possible valid sets: all years including the current year and 4
-        -- most recent previous years; and all years excluding current year and
-        -- including the 5 most recent previous years.  If the list of unique
-        -- years matches either of those, we know we have contributions in
-        -- 5 most recent consecutive years for a period optionally including the
-        -- current year.
-        GROUP_CONCAT(DISTINCT(YEAR(receive_date)) ORDER BY receive_date ASC SEPARATOR ',') IN (
-        CONCAT(
-          YEAR(CURDATE()) - 4, ',',
-          YEAR(CURDATE()) - 3, ',',
-          YEAR(CURDATE()) - 2, ',',
-          YEAR(CURDATE()) - 1, ',',
-          YEAR(CURDATE())
-        ),
-        concat (
-          YEAR(CURDATE()) - 5, ',',
-          YEAR(CURDATE()) - 4, ',',
-          YEAR(CURDATE()) - 3, ',',
-          YEAR(CURDATE()) - 2, ',',
-          YEAR(CURDATE()) - 1
-        ))
+        -- Find any one membership for this contact which is of type 'Active
+        -- Member', has status 'Active', and has start_date at least 5 years
+        -- before today.
+        IF(m.contact_id IS NULL, 0, 1)
       FROM
-        civicrm_contribution
+        civicrm_contact c
+        LEFT JOIN civicrm_membership m
+          ON c.id = m.contact_id
+            AND m.membership_type_id = 1                    -- type 'Active member'
+            AND m.status_id IN (1, 2, 3)                    -- status 'New', Current', or 'Grace'
+            AND m.start_date <= (now() - interval 5 year)   -- membership started more than 5 years ago
       WHERE
-        contact_id = NEW.contact_id
-        AND contribution_status_id = 1
-        AND financial_type_id = ". _paaosumfields_get_setting('membership_ftid') . "
-        AND total_amount >= 100
-        AND YEAR(receive_date) >= YEAR(CURDATE()) - 5
-      GROUP BY contact_id
+        c.id = NEW.contact_id
+      LIMIT 1
     )",
     'trigger_table' => 'civicrm_contribution',
     'optgroup' => 'paao_membership',
@@ -122,7 +105,7 @@ function paaosumfields_civicrm_postProcess($formName, &$form) {
     // Solution: here we get the ID of our Yes/No summary field and then use
     // the api to change field properties.
     $customFieldParameters = sumfields_get_setting('custom_field_parameters');
-    if ($field = CRM_Utils_Array::value('has_five_membership_payments', $customFieldParameters) ){
+    if ($field = CRM_Utils_Array::value('loyalty_discount', $customFieldParameters) ){
       $result = civicrm_api3('CustomField', 'create', array(
         'id' => CRM_Utils_Array::value('id', $field),
         'is_search_range' => 0,
