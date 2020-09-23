@@ -42,7 +42,7 @@ function paaosumfields_civicrm_sumfields_definitions(&$custom) {
       WHERE
         contact_id = NEW.contact_id
         AND contribution_status_id = 1
-        AND financial_type_id = '. _paaosumfields_get_setting('membership_ftid') . '
+        AND financial_type_id = ' . _paaosumfields_get_setting('membership_ftid') . '
         AND total_amount >= 100
     )',
     'trigger_table' => 'civicrm_contribution',
@@ -87,13 +87,12 @@ function paaosumfields_civicrm_sumfields_definitions(&$custom) {
       FROM civicrm_membership
       WHERE
         contact_id = NEW.contact_id
-        AND membership_type_id = '. _paaosumfields_get_setting('membership_in_training_mtid') . '
+        AND membership_type_id = ' . _paaosumfields_get_setting('membership_in_training_mtid') . '
     )',
     'trigger_table' => 'civicrm_membership',
     'optgroup' => 'paao_membership',
   );
 }
-
 
 /**
  * Implements hook_civicrm_postProcess().
@@ -105,7 +104,7 @@ function paaosumfields_civicrm_postProcess($formName, &$form) {
     // Solution: here we get the ID of our Yes/No summary field and then use
     // the api to change field properties.
     $customFieldParameters = sumfields_get_setting('custom_field_parameters');
-    if ($field = CRM_Utils_Array::value('loyalty_discount', $customFieldParameters) ){
+    if ($field = CRM_Utils_Array::value('loyalty_discount', $customFieldParameters)) {
       $result = civicrm_api3('CustomField', 'create', array(
         'id' => CRM_Utils_Array::value('id', $field),
         'is_search_range' => 0,
@@ -253,24 +252,24 @@ function paaosumfields_civicrm_entityTypes(&$entityTypes) {
  * Implements hook_civicrm_preProcess().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
-function paaosumfields_civicrm_preProcess($formName, &$form) {
+ */
+// function paaosumfields_civicrm_preProcess($formName, &$form) {
 
-} // */
+// } // */
 
 /**
  * Implements hook_civicrm_navigationMenu().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- *
-function paaosumfields_civicrm_navigationMenu(&$menu) {
-  _paaosumfields_civix_insert_navigation_menu($menu, 'Mailings', array(
-    'label' => E::ts('New subliminal message'),
-    'name' => 'mailing_subliminal_message',
-    'url' => 'civicrm/mailing/subliminal',
-    'permission' => 'access CiviMail',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _paaosumfields_civix_navigationMenu($menu);
-} // */
+ */
+// function paaosumfields_civicrm_navigationMenu(&$menu) {
+//   _paaosumfields_civix_insert_navigation_menu($menu, 'Mailings', array(
+//     'label' => E::ts('New subliminal message'),
+//     'name' => 'mailing_subliminal_message',
+//     'url' => 'civicrm/mailing/subliminal',
+//     'permission' => 'access CiviMail',
+//     'operator' => 'OR',
+//     'separator' => 0,
+//   ));
+//   _paaosumfields_civix_navigationMenu($menu);
+// } // */
