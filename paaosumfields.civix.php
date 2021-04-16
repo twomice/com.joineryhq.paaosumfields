@@ -6,10 +6,10 @@
  * The ExtensionUtil class provides small stubs for accessing resources of this
  * extension.
  */
-class CRM_Poaasumfields_ExtensionUtil {
+class CRM_Paaosumfields_ExtensionUtil {
   const SHORT_NAME = "paaosumfields";
   const LONG_NAME = "com.joineryhq.paaosumfields";
-  const CLASS_PREFIX = "CRM_Poaasumfields";
+  const CLASS_PREFIX = "CRM_Paaosumfields";
 
   /**
    * Translate a string using the extension's domain.
@@ -77,7 +77,7 @@ class CRM_Poaasumfields_ExtensionUtil {
 
 }
 
-use CRM_Poaasumfields_ExtensionUtil as E;
+use CRM_Paaosumfields_ExtensionUtil as E;
 
 /**
  * (Delegated) Implements hook_civicrm_config().
@@ -206,14 +206,14 @@ function _paaosumfields_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL
 }
 
 /**
- * @return CRM_Poaasumfields_Upgrader
+ * @return CRM_Paaosumfields_Upgrader
  */
 function _paaosumfields_civix_upgrader() {
-  if (!file_exists(__DIR__ . '/CRM/Poaasumfields/Upgrader.php')) {
+  if (!file_exists(__DIR__ . '/CRM/Paaosumfields/Upgrader.php')) {
     return NULL;
   }
   else {
-    return CRM_Poaasumfields_Upgrader_Base::instance();
+    return CRM_Paaosumfields_Upgrader_Base::instance();
   }
 }
 

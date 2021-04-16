@@ -23,6 +23,6 @@
   </compatibility>
   <comments>Developed by Joinery for Denver DataMan and PAAO</comments>
   <civix>
-    <namespace>CRM/Poaasumfields</namespace>
+    <namespace>CRM/Paaosumfields</namespace>
   </civix>
 </extension>
